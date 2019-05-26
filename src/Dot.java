@@ -19,19 +19,27 @@ public class Dot {
 	
 	public void moveX() {
 		int directionSwitch = new Random().nextInt(2);
-		if (directionSwitch == 0) {
-			x -= new Random().nextInt(5) + 1;
+		if ((x - 5) <= 0) {
+			x += new Random().nextInt(2) + 1;
+		} else if (directionSwitch == 0) {
+			x -= new Random().nextInt(2) + 1;
+		} else if ((x + 5) >= Main.SIZE) {
+			x -= new Random().nextInt(2) + 1;
 		} else {
-			x += new Random().nextInt(5) + 1;
+			x += new Random().nextInt(2) + 1;
 		}
 	}
 	
 	public void moveY() {
 		int directionSwitch = new Random().nextInt(2);
-		if (directionSwitch == 0) {
-			y -= new Random().nextInt(5) + 1;
+		if ((y - 5) <= 0) {
+			y += new Random().nextInt(2) + 1;
+		} else if (directionSwitch == 0) {
+			y -= new Random().nextInt(2) + 1;
+		} else if ((y + 5) >= Main.SIZE) {
+			y -= new Random().nextInt(2) + 1;
 		} else {
-			y += new Random().nextInt(5) + 1;
+			y += new Random().nextInt(2) + 1;
 		}
 	}
 }

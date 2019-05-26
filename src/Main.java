@@ -7,15 +7,19 @@ import javax.swing.JPanel;
 
 public class Main extends JFrame {
 
-	Dot[] dots;
+	private Dot[] dots;
+	public static final int SIZE = 800;
+	private int red = 0;
+	private int green = 0;
+	private int blue = 0;
 	
 	public Main() {
 		super("My Frame");
 
-		dots = new Dot[30];
+		dots = new Dot[15];
 		for (int i = 0; i < dots.length; i++) {
-			int x = new Random().nextInt(350);
-			int y = new Random().nextInt(350);
+			int x = new Random().nextInt(SIZE - 50);
+			int y = new Random().nextInt(SIZE - 50);
 			dots[i] = new Dot(x, y);
 		}
 
@@ -23,12 +27,12 @@ public class Main extends JFrame {
 		DrawPane contentPane = new DrawPane();
 		setContentPane(contentPane);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(400, 400);
+		setSize(SIZE, SIZE);
 		setVisible(true);
 		
 		while (true) {
 			try {
-				Thread.sleep(200);
+				Thread.sleep(20);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -47,14 +51,50 @@ public class Main extends JFrame {
 	// Create a component that you can actually draw on.
 	class DrawPane extends JPanel {
 
+		private int colorChange = 0;
+		
+		public DrawPane() {
+			setSize(SIZE, SIZE);
+		}
+		
 		public void paintComponent(Graphics g) {
 			g.setColor(Color.WHITE);
-			g.fillRect(0, 0, 400, 400);
-			g.setColor(Color.BLUE);
+			g.fillRect(0, 0, SIZE, SIZE);
+			Color lineColor = new Color(red, green, blue);
+			if (colorChange == 20) {
+				changeColor();
+				colorChange = 0;
+			}
+			g.setColor(lineColor);
+			colorChange++;
 			for (int i = 0; i < dots.length; i++) {
 				for (int j = 0; j < dots.length; j++) {
 					g.drawLine(dots[i].getX(), dots[i].getY(), dots[j].getX(), dots[j].getY());
 				}
+			}
+		}
+		
+		private void changeColor() {
+			int redUp = 200 - red;
+			int greenUp = 200 - green;
+			int blueUp = 200 - blue;
+						
+			if (redUp != 0) {
+				red += new Random().nextInt(redUp + 1);
+			} else {
+				red = 0;
+			}
+			
+			if (greenUp != 0) {
+				green += new Random().nextInt(greenUp + 1);
+			} else {
+				green = 0;
+			}
+			
+			if (blueUp != 0) {
+				blue += new Random().nextInt(blueUp + 1);
+			} else {
+				blue = 0;
 			}
 		}
 	}
