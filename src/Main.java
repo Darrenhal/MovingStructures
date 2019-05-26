@@ -16,7 +16,7 @@ public class Main extends JFrame {
 	public Main() {
 		super("My Frame");
 
-		dots = new Dot[15];
+		dots = new Dot[25];
 		for (int i = 0; i < dots.length; i++) {
 			int x = new Random().nextInt(SIZE - 50);
 			int y = new Random().nextInt(SIZE - 50);
@@ -32,7 +32,7 @@ public class Main extends JFrame {
 		
 		while (true) {
 			try {
-				Thread.sleep(20);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -60,42 +60,17 @@ public class Main extends JFrame {
 		public void paintComponent(Graphics g) {
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, SIZE, SIZE);
-			Color lineColor = new Color(red, green, blue);
-			if (colorChange == 20) {
-				changeColor();
-				colorChange = 0;
-			}
-			g.setColor(lineColor);
-			colorChange++;
 			for (int i = 0; i < dots.length; i++) {
+				g.setColor(dots[i].getDotColor());
 				for (int j = 0; j < dots.length; j++) {
+					if (colorChange == 20) {
+						dots[i].changeDotColor();
+						colorChange = 0;
+					}
 					g.drawLine(dots[i].getX(), dots[i].getY(), dots[j].getX(), dots[j].getY());
 				}
 			}
-		}
-		
-		private void changeColor() {
-			int redUp = 200 - red;
-			int greenUp = 200 - green;
-			int blueUp = 200 - blue;
-						
-			if (redUp != 0) {
-				red += new Random().nextInt(redUp + 1);
-			} else {
-				red = 0;
-			}
-			
-			if (greenUp != 0) {
-				green += new Random().nextInt(greenUp + 1);
-			} else {
-				green = 0;
-			}
-			
-			if (blueUp != 0) {
-				blue += new Random().nextInt(blueUp + 1);
-			} else {
-				blue = 0;
-			}
+			colorChange ++;
 		}
 	}
 
