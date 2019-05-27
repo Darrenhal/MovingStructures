@@ -52,7 +52,11 @@ public class Main extends JFrame {
 					userChoice = JOptionPane.showOptionDialog(null, "Choose Structure Mode", "Menu", 1, 1, null, colorModes, null);
 				}
 				
-				if (userChoice != -1) {
+				if (e.getKeyChar() == 'h' && userChoice != -1) {
+					drawMode = userChoice;
+				}
+				
+				if (e.getKeyChar() == 'c' && userChoice != -1) {
 					colorMode = userChoice;
 					colorModeChanged = true;
 				}

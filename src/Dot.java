@@ -97,7 +97,6 @@ public class Dot {
 			} else {
 				blue += colorModifier;
 			}
-			System.out.println("Red: " + red + " Green: " + green + " Blue: " + blue);
 		}
 	}
 
