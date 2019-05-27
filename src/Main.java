@@ -1,22 +1,30 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Random;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class Main extends JFrame {
 
+	private static final long serialVersionUID = -609013040811944425L;
 	private Dot[] dots;
 	public static final int SIZE = 800;
-	private int red = 0;
-	private int green = 0;
-	private int blue = 0;
+	private final int colorReset = 20;
+	private String[] drawModes = {"Static", "Mouse-Controlled", "Slight Random Movement", "Complete Madness"};
+	private String[] colorModes = {"Random", "Spectrum"};
+	private int drawMode = 2; //0 = mouse-controlled; 1 = slight random movement; 2 = complete randomness
+	private int colorMode = 0;
+	private boolean colorModeChanged = false;
+	
 	
 	public Main() {
-		super("My Frame");
+		super("Moving Structures - Press h for more options");
 
-		dots = new Dot[25];
+		dots = new Dot[15];
 		for (int i = 0; i < dots.length; i++) {
 			int x = new Random().nextInt(SIZE - 50);
 			int y = new Random().nextInt(SIZE - 50);
@@ -27,16 +35,51 @@ public class Main extends JFrame {
 		DrawPane contentPane = new DrawPane();
 		setContentPane(contentPane);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLayout(null);
 		setSize(SIZE, SIZE);
 		setVisible(true);
 		
-		while (true) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				int userChoice = 0;
+				if (e.getKeyChar() == 'h') {
+					userChoice = JOptionPane.showOptionDialog(null, "Choose Structure Mode", "Menu", 1, 1, null, drawModes, null);
+				}
+				
+				if (e.getKeyChar() == 'c') {
+					userChoice = JOptionPane.showOptionDialog(null, "Choose Structure Mode", "Menu", 1, 1, null, colorModes, null);
+				}
+				
+				if (userChoice != -1) {
+					colorMode = userChoice;
+					colorModeChanged = true;
+				}
 			}
-			move();
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		while (true) {
+			if (drawMode == 3) {
+				sleep(200);
+			} else {
+				sleep(50);
+			}
+			if (drawMode != 0) {
+				move();
+			}
 			contentPane.repaint();
 		}
 	}
@@ -48,9 +91,18 @@ public class Main extends JFrame {
 		}
 	}
 
+	private void sleep(int time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	// Create a component that you can actually draw on.
 	class DrawPane extends JPanel {
 
+		private static final long serialVersionUID = 6061095142990749109L;
 		private int colorChange = 0;
 		
 		public DrawPane() {
@@ -60,17 +112,36 @@ public class Main extends JFrame {
 		public void paintComponent(Graphics g) {
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, SIZE, SIZE);
+			
+			if (drawMode == 0) {
+				drawDots(g);
+			} else if (drawMode == 1) {
+				drawDots(g);
+			} else if (drawMode == 2) {
+				drawDots(g);
+			} else if (drawMode == 3) {
+				for (int i = 0; i < dots.length; i++) {
+					dots[i].generateRandomPosition();
+					drawDots(g);
+				}
+			}
+			if (colorChange == colorReset) {
+				colorChange = 0;
+			}
+			colorChange ++;
+		}
+		
+		private void drawDots(Graphics g) {
 			for (int i = 0; i < dots.length; i++) {
-				g.setColor(dots[i].getDotColor());
+				g.setColor((Color) dots[i].getDotColor(colorMode));
+				if (colorChange == colorReset) {
+					dots[i].changeDotColor(colorMode, colorModeChanged);
+					colorModeChanged = false;
+				}
 				for (int j = 0; j < dots.length; j++) {
-					if (colorChange == 20) {
-						dots[i].changeDotColor();
-						colorChange = 0;
-					}
 					g.drawLine(dots[i].getX(), dots[i].getY(), dots[j].getX(), dots[j].getY());
 				}
 			}
-			colorChange ++;
 		}
 	}
 
