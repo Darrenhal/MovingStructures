@@ -24,10 +24,18 @@ public class Dot {
 	public int getY() {
 		return y;
 	}
+	
+	public void setX() {
+		
+	}
+	
+	public void setY() {
+		
+	}
 
 	public void generateRandomPosition() {
-		x = new Random().nextInt(Main.SIZE - 50);
-		y = new Random().nextInt(Main.SIZE - 50);
+		x = new Random().nextInt(Main.screen.width - 50);
+		y = new Random().nextInt(Main.screen.height - 50);
 	}
 
 	public void moveX() {
@@ -36,7 +44,7 @@ public class Dot {
 			x += new Random().nextInt(3) + 1;
 		} else if (directionSwitch == 0) {
 			x -= new Random().nextInt(3) + 1;
-		} else if ((x + 5) >= Main.SIZE) {
+		} else if ((x + 5) >= Main.screen.width) {
 			x -= new Random().nextInt(3) + 1;
 		} else {
 			x += new Random().nextInt(3) + 1;
@@ -49,7 +57,7 @@ public class Dot {
 			y += new Random().nextInt(3) + 1;
 		} else if (directionSwitch == 0) {
 			y -= new Random().nextInt(3) + 1;
-		} else if ((y + 5) >= Main.SIZE) {
+		} else if ((y + 5) >= Main.screen.height) {
 			y -= new Random().nextInt(3) + 1;
 		} else {
 			y += new Random().nextInt(3) + 1;
