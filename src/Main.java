@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -20,18 +21,23 @@ public class Main extends JFrame {
 	private final int colorReset = 20;
 	private String[] drawModes = { "Static", "Mouse-Controlled", "Slight Random Movement", "Complete Madness" };
 	private String[] colorModes = { "Random", "Spectrum" };
-	private int drawMode = 2; // 0 = static; 1 = mouse-controlled; 2 = slight random movement; 3 = complete
+	private String[] options = { "Respawn Dots", "Set Dot Amount" };
+	private int drawMode = 2; // 0 = static; 1 = mouse-controlled; 2 = slight
+								// random movement; 3 = complete
 								// randomness
 	private int colorMode = 0;
+	private int option = 0;
+	private int dotAmount = 15;
 	private boolean colorModeChanged = false;
 	private boolean focusOnFrame = false;
+	private boolean pauseDrawing = false;
 
 	public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 
 	public Main() {
 		super("Moving Structures - Press h for more options");
 
-		dots = new Dot[15];
+		dots = new Dot[dotAmount];
 		for (int i = 0; i < dots.length; i++) {
 			int x = new Random().nextInt(screen.width - 50);
 			int y = new Random().nextInt(screen.height - 50);
@@ -44,6 +50,7 @@ public class Main extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
 		setSize(screen.width, screen.height);
+		setResizable(false);
 		setVisible(true);
 
 		addKeyListener(new KeyListener() {
@@ -52,13 +59,19 @@ public class Main extends JFrame {
 			public void keyTyped(KeyEvent e) {
 				int userChoice = 0;
 				if (e.getKeyChar() == 'h') {
-					userChoice = JOptionPane.showOptionDialog(null, "Choose Structure Mode", "Menu", 1, 1, null,
-							drawModes, null);
+					userChoice = JOptionPane.showOptionDialog(null, "Choose Structure Mode", "Structure Menu", 1, 1,
+							null, drawModes, null);
 				}
 
 				if (e.getKeyChar() == 'c') {
-					userChoice = JOptionPane.showOptionDialog(null, "Choose Structure Mode", "Menu", 1, 1, null,
+					userChoice = JOptionPane.showOptionDialog(null, "Choose Color Mode", "Color Menu", 1, 1, null,
 							colorModes, null);
+				}
+
+				if (e.getKeyChar() == 'o') {
+					pauseDrawing = true;
+					userChoice = JOptionPane.showOptionDialog(null, "Choose an option", "Options", 1, 1, null, options,
+							null);
 				}
 
 				if (e.getKeyChar() == 'h' && userChoice != -1) {
@@ -68,6 +81,35 @@ public class Main extends JFrame {
 				if (e.getKeyChar() == 'c' && userChoice != -1) {
 					colorMode = userChoice;
 					colorModeChanged = true;
+				}
+
+				if (e.getKeyChar() == 'o' && userChoice != -1) {
+					if (userChoice == 0) {
+						dots = new Dot[dotAmount];
+						for (int i = 0; i < dots.length; i++) {
+							int x = new Random().nextInt(screen.width - 50);
+							int y = new Random().nextInt(screen.height - 50);
+							dots[i] = new Dot(x, y);
+						}
+					}
+					if (userChoice == 1) {
+						boolean validInput = false;
+						String input;
+						while (!validInput) {
+							input = JOptionPane.showInputDialog(null,
+									"Choose the amount of dots you'd like to have on screen", "Set Dot Amount", 1);
+							if (input.matches("[0-9]*")) {
+								dotAmount = Integer.parseInt(input);
+								dots = new Dot[dotAmount];
+								validInput = true;
+								for (int i = 0; i < dots.length; i++) {
+									int x = new Random().nextInt(screen.width - 50);
+									int y = new Random().nextInt(screen.height - 50);
+									dots[i] = new Dot(x, y);
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -83,27 +125,49 @@ public class Main extends JFrame {
 
 			}
 		});
-		
+
 		addMouseMotionListener(new MouseMotionListener() {
-			
+
 			@Override
 			public void mouseMoved(MouseEvent e) {
+				if (drawMode == 1) {
+					double screenDiagonal = 0;
+					double distanceFromMouse = 0;
+					double movementWeight = 0;
+					Point mousePosition = getMousePosition();
+					for (int i = 0; i < dots.length; i++) {
+						screenDiagonal = Math.sqrt(Math.pow(screen.getHeight(), 2) + Math.pow(screen.getWidth(), 2));
+						distanceFromMouse = Math.sqrt(Math.pow(Math.abs(mousePosition.getX() - dots[i].getX()), 2)
+								+ Math.pow(Math.abs(mousePosition.getY() - dots[i].getY()), 2));
+						movementWeight = Math.pow((1 - (distanceFromMouse / screenDiagonal)), 4) * 0.02;
+						if (mousePosition.getX() > dots[i].getX()) {
+							dots[i].setX(dots[i].getX() + (int) (distanceFromMouse * movementWeight));
+						} else {
+							dots[i].setX(dots[i].getX() - (int) (distanceFromMouse * movementWeight));
+						}
+						if (mousePosition.getY() > dots[i].getY()) {
+							dots[i].setY(dots[i].getY() + (int) (distanceFromMouse * movementWeight));
+						} else {
+							dots[i].setY(dots[i].getY() - (int) (distanceFromMouse * movementWeight));
+						}
+					}
+				}
 			}
-			
+
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
+
 		while (true) {
 			if (drawMode == 3) {
 				sleep(200);
 			} else {
 				sleep(50);
 			}
-			if (drawMode != 0) {
+			if (drawMode != 0 && drawMode != 1) {
 				move();
 			}
 			contentPane.repaint();
